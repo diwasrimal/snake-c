@@ -1,96 +1,102 @@
-#include <raylib.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
-#define MARGIN 2
-// #define CELL_SIZE 20
-#define CELL_SIZE 50
-#define FRAME_PADDING 10
-// #define CELLS_HOR 40
-// #define CELLS_VER 30
-#define CELLS_HOR 10
-#define CELLS_VER 10
-#define FRAME_WIDTH CELL_SIZE * CELLS_HOR + MARGIN * (CELLS_HOR - 1)
-#define FRAME_HEIGHT CELL_SIZE * CELLS_VER + MARGIN * (CELLS_VER - 1)
-#define WINDOW_WIDTH FRAME_WIDTH + FRAME_PADDING * 2
-#define WINDOW_HEIGHT FRAME_HEIGHT + FRAME_PADDING * 2
-
-enum SnakeDirection {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-};
-
-typedef struct {
-    int x;
-    int y;
-} Cell;
-
-typedef struct Snake {
-    Cell cell;
-    struct Snake *next;
-} Snake;
-
-Snake *initSnake(void);
-Cell randomCell(void);
+#include "helpers.c"
 
 int main(void)
 {
-    int count = 0;
     srand(time(0));
 
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Snake");
-    Color colors[] = {GOLD, MAGENTA, LIME, YELLOW};
+    Color background = {.r = 31, .g = 31, .b = 40, .a = 255};
+    Color colors[] = {GREEN, RAYWHITE};
+    int colors_len = 2;
 
-    Snake *head = initSnake();
-    Cell apple = randomCell();
+    int count = 0;
+    int limit = 4;
+    int fps = 40;
+    bool dir_should_change = true;
+
+    // Array to keep track of pieces used by snake
+    bool **used_cells = malloc(sizeof(bool*) * CELLS_VER);
+    for (int i = 0; i < CELLS_VER; i++)
+        used_cells[i] = malloc(sizeof(bool) * CELLS_HOR);
+
+    // Snake and apple
+    Snake *head = initSnake(used_cells);
+    Cell apple = newApple((const bool**) used_cells);
+
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Snake");
+    SetTargetFPS(fps);
 
     while (!WindowShouldClose()) {
+        ClearBackground(background);
         BeginDrawing();
 
-        for (int y = FRAME_PADDING; y < FRAME_HEIGHT; y += CELL_SIZE + MARGIN) {
-            for (int x = FRAME_PADDING; x < FRAME_WIDTH; x += CELL_SIZE + MARGIN) {
-                DrawRectangle(apple.x, apple.y, CELL_SIZE, CELL_SIZE, colors[count % 4]);
-                for (Snake *s = head; s != NULL; s = s->next) {
-                    DrawRectangle(s->cell.x, s->cell.y, CELL_SIZE, CELL_SIZE, RAYWHITE);
-                }
+        printf("FPS: %d\n", GetFPS());
+
+        if (IsKeyPressed(KEY_R)) {
+            ClearBackground(background);
+            head = initSnake(used_cells);
+            apple = newApple((const bool**) used_cells);
+        }
+
+        // Register just single direction for upcoming snake movement
+        if (dir_should_change) {
+            if (IsKeyPressed(KEY_RIGHT) && head->direction != LEFT) {
+                dir_should_change = false;
+                head->direction = RIGHT;
+            }
+            if (IsKeyPressed(KEY_LEFT) && head->direction != RIGHT) {
+                dir_should_change = false;
+                head->direction = LEFT;
+            }
+            if (IsKeyPressed(KEY_UP) && head->direction != DOWN) {
+                dir_should_change = false;
+                head->direction = UP;
+            }
+            if (IsKeyPressed(KEY_DOWN) && head->direction != UP) {
+                dir_should_change = false;
+                head->direction = DOWN;
             }
         }
 
-        count++;
-        printf("Count: %d\n", count);
-        WaitTime(0.1);
+        // Limit snake speed by moving it once every `limit` frames
+        // If fps is reduced directly, key presses become less responsive
+        bool snake_should_move = count % limit == 0;
+        bool snake_moves;
+        if (snake_should_move) {
+            snake_moves = moveSnake(head, used_cells, &apple);
+            dir_should_change = true;
+        }
+
+        // Draw sapple and snake
+        DrawRectangle(apple.pos_x, apple.pos_y, CELL_SIZE, CELL_SIZE, colors[count % colors_len]);
+        for (Snake *s = head; s != NULL; s = s->next)
+            DrawRectangle(s->cell.pos_x, s->cell.pos_y, CELL_SIZE, CELL_SIZE, RAYWHITE);
+
+        if (!snake_moves) {
+            const char *text = "Game over";
+            float fontSize = 50;
+            int width = MeasureText(text, fontSize);
+            DrawText(text, WINDOW_WIDTH / 2 - width / 2, WINDOW_HEIGHT / 2 - (int)fontSize / 2, fontSize, RED);
+            EndDrawing();
+            WaitTime(2);
+            break;
+        }
+
+        // Draw used
+        for (int i = 0; i < CELLS_VER; i++) {
+            for (int j = 0; j < CELLS_HOR; j++) {
+                if (!used_cells[i][j])
+                    continue;
+                Cell c = {.idx_y = i, .idx_x = j};
+                updateCellPosition(&c);
+                DrawText("U", c.pos_x + CELL_SIZE / 2, c.pos_y + CELL_SIZE / 2, 10, RED);
+            }
+        }
+
+        // printf("Snake direction: %d\n", head->direction);
+        count = (count + 1) % limit;
         EndDrawing();
     }
 
     // free snake
-}
-
-Cell randomCell(void)
-{
-    Cell c;
-    int offset = FRAME_PADDING;
-    int rand_hor_cell = rand() % CELLS_HOR - 1;
-    int rand_ver_cell = rand() % CELLS_VER - 1;
-
-    c.y = offset + rand_ver_cell * (CELL_SIZE + MARGIN);
-    c.x = offset + rand_hor_cell * (CELL_SIZE + MARGIN);
-
-    return c;
-}
-
-Snake *initSnake(void)
-{
-    Snake *head = malloc(sizeof(Snake));
-    head->cell = randomCell();
-
-    Snake *next = malloc(sizeof(Snake));
-    next->cell.y = head->cell.y + (CELL_SIZE + MARGIN);
-    next->cell.x = head->cell.x;
-    next->next = NULL;
-
-    head->next = next;
-    return head;
+    // free used
 }
