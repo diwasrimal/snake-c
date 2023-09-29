@@ -4,5 +4,6 @@ set -xe
 
 LIBS=$(pkg-config --libs raylib)
 CFLAGS=$(pkg-config --cflags raylib)
+CC=clang
 
-cc -o snake snake.c -g $CFLAGS $LIBS
+$CC -o snake snake.c -g $CFLAGS $LIBS
