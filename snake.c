@@ -97,6 +97,11 @@ int main(void)
         EndDrawing();
     }
 
-    // free snake
-    // free used
+    freeSnake(head);
+
+    for (int i = 0; i < CELLS_VER; i++)
+        free(used_cells[i]);
+    free(used_cells);
+
+    return 0;
 }

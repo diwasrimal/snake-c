@@ -39,4 +39,5 @@ Cell randomCell(void);
 Cell newApple(const bool **used);
 void updateCellPosition(Cell *c);
 bool moveSnake(Snake *head, bool **used, Cell *apple);
+void freeSnake(Snake *head);
 void printUsed(bool **used);

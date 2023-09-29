@@ -130,6 +130,16 @@ bool moveSnake(Snake *head, bool **used, Cell *apple)
 
 }
 
+void freeSnake(Snake *head)
+{
+    Snake *tmp;
+    while (head != NULL) {
+        tmp = head;
+        head = head->next;
+        free(tmp);
+    }
+}
+
 void printUsed(bool **used)
 {
     printf("\n");
