@@ -8,6 +8,7 @@ int main(void)
     Color colors[] = {GREEN, RAYWHITE};
     int colors_len = 2;
 
+    int score = 0;
     int count = 0;
     int limit = 4;
     int fps = 40;
@@ -60,20 +61,27 @@ int main(void)
         bool snake_should_move = count % limit == 0;
         bool snake_moves;
         if (snake_should_move) {
-            snake_moves = moveSnake(head, used_cells, &apple);
+            snake_moves = moveSnake(head, used_cells, &apple, &score);
             dir_should_change = true;
         }
 
-        // Draw sapple and snake
+        // Draw score
+        char text[15];
+        int fontSize = SCORE_HEIGHT;
+        sprintf(text, "Score: %d", score);
+        int width = MeasureText(text, fontSize);
+        DrawText(text, WINDOW_WIDTH / 2 - width / 2, FRAME_PADDING, fontSize, RAYWHITE);
+
+        // Draw apple and snake
         DrawRectangle(apple.pos_x, apple.pos_y, CELL_SIZE, CELL_SIZE, colors[count % colors_len]);
         for (Snake *s = head; s != NULL; s = s->next)
             DrawRectangle(s->cell.pos_x, s->cell.pos_y, CELL_SIZE, CELL_SIZE, RAYWHITE);
 
         if (!snake_moves) {
             const char *text = "Game over";
-            float fontSize = 50;
+            int fontSize = 50;
             int width = MeasureText(text, fontSize);
-            DrawText(text, WINDOW_WIDTH / 2 - width / 2, WINDOW_HEIGHT / 2 - (int)fontSize / 2, fontSize, RED);
+            DrawText(text, WINDOW_WIDTH / 2 - width / 2, WINDOW_HEIGHT / 2 - fontSize / 2, fontSize, RED);
             EndDrawing();
             WaitTime(2);
             break;

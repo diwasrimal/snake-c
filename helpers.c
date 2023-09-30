@@ -22,7 +22,7 @@ Cell newApple(const bool **used)
 void updateCellPosition(Cell *c)
 {
 
-    c->pos_y = FRAME_PADDING + c->idx_y * (CELL_SIZE + MARGIN);
+    c->pos_y = FRAME_PADDING + SCORE_HEIGHT + c->idx_y * (CELL_SIZE + MARGIN);
     c->pos_x = FRAME_PADDING + c->idx_x * (CELL_SIZE + MARGIN);
 }
 
@@ -34,7 +34,6 @@ Snake *initSnake(bool **used)
 
     // Initialize next cell
     Snake *next = malloc(sizeof(Snake));
-    int offset = CELL_SIZE + MARGIN;
     bool y_touches_boundary = head->cell.idx_y + 1 >= CELLS_VER;
     next->cell.idx_x = head->cell.idx_x;
     if (y_touches_boundary) {
@@ -60,7 +59,7 @@ Snake *initSnake(bool **used)
     return head;
 }
 
-bool moveSnake(Snake *head, bool **used, Cell *apple)
+bool moveSnake(Snake *head, bool **used, Cell *apple, int *score)
 {
     Cell prev = head->cell;
 
@@ -100,6 +99,7 @@ bool moveSnake(Snake *head, bool **used, Cell *apple)
         head->next = s;
         used[s->cell.idx_y][s->cell.idx_x] = true;
         *apple = newApple((const bool**) used);
+        (*score)++;
         return true;
     }
 
@@ -113,9 +113,7 @@ bool moveSnake(Snake *head, bool **used, Cell *apple)
 
     // Last piece will be unused
     used[prev.idx_y][prev.idx_x] = false;
-    // printUsed(used);
     return true;
-
 }
 
 void freeSnake(Snake *head)
