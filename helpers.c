@@ -39,7 +39,8 @@ Snake *initSnake(bool **used)
     if (y_touches_boundary) {
         next->cell.idx_y = head->cell.idx_y - 1;
         head->direction = LEFT;
-    } else {
+    }
+    else {
         next->cell.idx_y = head->cell.idx_y + 1;
         head->direction = UP;
     }
@@ -66,13 +67,15 @@ bool moveSnake(Snake *head, bool **used, Cell *apple, int *score)
     // Move head
     switch (head->direction) {
     case UP:
-        head->cell.idx_y = (head->cell.idx_y - 1) < 0 ? CELLS_VER - 1 : head->cell.idx_y - 1;
+        head->cell.idx_y =
+            (head->cell.idx_y - 1) < 0 ? CELLS_VER - 1 : head->cell.idx_y - 1;
         break;
     case DOWN:
         head->cell.idx_y = (head->cell.idx_y + 1) % CELLS_VER;
         break;
     case LEFT:
-        head->cell.idx_x = (head->cell.idx_x - 1) < 0 ? CELLS_HOR - 1 : head->cell.idx_x - 1;
+        head->cell.idx_x =
+            (head->cell.idx_x - 1) < 0 ? CELLS_HOR - 1 : head->cell.idx_x - 1;
         break;
     case RIGHT:
         head->cell.idx_x = (head->cell.idx_x + 1) % CELLS_HOR;
@@ -98,7 +101,7 @@ bool moveSnake(Snake *head, bool **used, Cell *apple, int *score)
         s->next = head->next;
         head->next = s;
         used[s->cell.idx_y][s->cell.idx_x] = true;
-        *apple = newApple((const bool**) used);
+        *apple = newApple((const bool **)used);
         (*score)++;
         return true;
     }

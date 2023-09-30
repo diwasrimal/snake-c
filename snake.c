@@ -15,13 +15,13 @@ int main(void)
     bool dir_should_change = true;
 
     // Array to keep track of pieces used by snake
-    bool **used_cells = malloc(sizeof(bool*) * CELLS_VER);
+    bool **used_cells = malloc(sizeof(bool *) * CELLS_VER);
     for (int i = 0; i < CELLS_VER; i++)
         used_cells[i] = malloc(sizeof(bool) * CELLS_HOR);
 
     // Snake and apple
     Snake *head = initSnake(used_cells);
-    Cell apple = newApple((const bool**) used_cells);
+    Cell apple = newApple((const bool **)used_cells);
 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Snake");
     SetTargetFPS(fps);
@@ -33,7 +33,7 @@ int main(void)
         if (IsKeyPressed(KEY_R)) {
             ClearBackground(background);
             head = initSnake(used_cells);
-            apple = newApple((const bool**) used_cells);
+            apple = newApple((const bool **)used_cells);
         }
 
         // Register just single direction for upcoming snake movement
@@ -70,18 +70,22 @@ int main(void)
         int fontSize = SCORE_HEIGHT;
         sprintf(text, "Score: %d", score);
         int width = MeasureText(text, fontSize);
-        DrawText(text, WINDOW_WIDTH / 2 - width / 2, FRAME_PADDING, fontSize, RAYWHITE);
+        DrawText(text, WINDOW_WIDTH / 2 - width / 2, FRAME_PADDING, fontSize,
+                 RAYWHITE);
 
         // Draw apple and snake
-        DrawRectangle(apple.pos_x, apple.pos_y, CELL_SIZE, CELL_SIZE, colors[count % colors_len]);
+        DrawRectangle(apple.pos_x, apple.pos_y, CELL_SIZE, CELL_SIZE,
+                      colors[count % colors_len]);
         for (Snake *s = head; s != NULL; s = s->next)
-            DrawRectangle(s->cell.pos_x, s->cell.pos_y, CELL_SIZE, CELL_SIZE, RAYWHITE);
+            DrawRectangle(s->cell.pos_x, s->cell.pos_y, CELL_SIZE, CELL_SIZE,
+                          RAYWHITE);
 
         if (!snake_moves) {
             const char *text = "Game over";
             int fontSize = 50;
             int width = MeasureText(text, fontSize);
-            DrawText(text, WINDOW_WIDTH / 2 - width / 2, WINDOW_HEIGHT / 2 - fontSize / 2, fontSize, RED);
+            DrawText(text, WINDOW_WIDTH / 2 - width / 2,
+                     WINDOW_HEIGHT / 2 - fontSize / 2, fontSize, RED);
             EndDrawing();
             WaitTime(2);
             break;
@@ -94,7 +98,8 @@ int main(void)
                     continue;
                 Cell c = {.idx_y = i, .idx_x = j};
                 updateCellPosition(&c);
-                DrawText("U", c.pos_x + CELL_SIZE / 2, c.pos_y + CELL_SIZE / 2, 10, RED);
+                DrawText("U", c.pos_x + CELL_SIZE / 2, c.pos_y + CELL_SIZE / 2,
+                         10, RED);
             }
         }
 
