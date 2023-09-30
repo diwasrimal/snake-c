@@ -3,7 +3,7 @@
 set -xe
 
 LIBS=$(pkg-config --libs raylib)
-CFLAGS=$(pkg-config --cflags raylib)
+CFLAGS="-Wall -Wextra $(pkg-config --cflags raylib)"
 CC=clang
 
-$CC -o snake snake.c -g $CFLAGS $LIBS
+$CC $CFLAGS -g -o snake snake.c $LIBS
