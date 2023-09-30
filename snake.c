@@ -29,8 +29,6 @@ int main(void)
         ClearBackground(background);
         BeginDrawing();
 
-        printf("FPS: %d\n", GetFPS());
-
         if (IsKeyPressed(KEY_R)) {
             ClearBackground(background);
             head = initSnake(used_cells);
@@ -81,7 +79,7 @@ int main(void)
             break;
         }
 
-        // Draw used
+        // Mark used cells
         for (int i = 0; i < CELLS_VER; i++) {
             for (int j = 0; j < CELLS_HOR; j++) {
                 if (!used_cells[i][j])
@@ -92,7 +90,6 @@ int main(void)
             }
         }
 
-        // printf("Snake direction: %d\n", head->direction);
         count = (count + 1) % limit;
         EndDrawing();
     }
