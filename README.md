@@ -14,6 +14,11 @@ $ ./build.sh
 $ ./snake
 ```
 
+## Cross compile to Windows with mingw-w64
+```sh
+$ ./build_mingw.sh
+```
+
 ## Controls
 * Arrow keys
 * `Esc` to exit
