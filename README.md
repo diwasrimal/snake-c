@@ -2,6 +2,9 @@
 
 A simple snake game made with raylib.
 
+## Binary for Windows
+https://github.com/diwasrimal/snake-c/releases/download/v1.0.0/snake-c-win64.zip
+
 ## Build
 
 * Requires [raylib](https://www.raylib.com/)
